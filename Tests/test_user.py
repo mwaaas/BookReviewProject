@@ -90,7 +90,7 @@ class TestUserArePersisted(TestCase):
         results = subprocess.run([
                     "python",
                     "manage.py",
-                    "users_login",
+                    "user_login",
                     f"--username={random_usersname}",
                     f"--password={password}",
                     ], stdout=subprocess.PIPE)
