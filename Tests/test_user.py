@@ -17,7 +17,7 @@ class TestUser(TestCase):
     def test_register(self):
         registered_users = users.register("foo", "bar", "bar", "30/12/1980")
 
-        self.assertDictEqual(registered_users,  {"usersname": "foo", "password": "bar", "dateOfBirth": "30/12/1980"})
+        self.assertDictEqual(registered_users,  {"username": "foo", "password": "bar", "dateOfBirth": "30/12/1980"})
 
         # test register with users name who already exist 
         self.assertRaises(users.UserAlreadyExist, users.register, "foo", "password", "password", "30/12/1980")
@@ -28,11 +28,11 @@ class TestUser(TestCase):
 
     def test_login(self):
         # first register users
-        registered_users = users.register("users1", "users1password", "users1password", "30/12/1980")
-        self.assertEqual(registered_users, users.login("users1", "users1password"))
+        registered_users = users.register("user1", "user1password", "user1password", "30/12/1980")
+        self.assertEqual(registered_users, users.login("user1", "user1password"))
 
         # test login with invalid password
-        self.assertRaises(users.InvalidPassword, users.login, "users1", "wrongPassword")
+        self.assertRaises(users.InvalidPassword, users.login, "user1", "wrongPassword")
 
         # test login with users who does not exist
         self.assertRaises(users.InvalidUsername, users.login, "bar",  "bar")
@@ -55,19 +55,18 @@ class TestUserArePersisted(TestCase):
         password, dateOfBirth = "bar", "30/12/1970"
         results = subprocess.run([
             "python", 
-            "BookReviewFromScratch/manage.py",
-            "users_register",
-            f"--usersname={random_usersname}",
+            "manage.py",
+            "user_register",
+            f"--username={random_usersname}",
             f"--password={password}", 
             f"--password2={password}",
             f"--dateOfBirth={dateOfBirth}"], stdout=subprocess.PIPE)
-        
         self.assertEqual(0, results.returncode)
 
         # now check the users is registered
         self.assertDictEqual(
             {
-                "usersname": random_usersname,
+                "username": random_usersname,
                 "password": password,
                 "dateOfBirth": dateOfBirth
                 },
@@ -80,9 +79,9 @@ class TestUserArePersisted(TestCase):
         # test login with invalid passowrd fails
         results = subprocess.run([
                     "python",
-                    "BookReviewFromScratch/manage.py",
-                    "users_login",
-                    f"--usersname={random_usersname}",
+                    "manage.py",
+                    "user_login",
+                    f"--username={random_usersname}",
                     f"--password={password}_invalid_password",
                     ], stdout=subprocess.PIPE)
         self.assertEqual(1, results.returncode)
@@ -90,9 +89,9 @@ class TestUserArePersisted(TestCase):
         # test login with valid password
         results = subprocess.run([
                     "python",
-                    "BookReviewFromScratch/manage.py",
+                    "manage.py",
                     "users_login",
-                    f"--usersname={random_usersname}",
+                    f"--username={random_usersname}",
                     f"--password={password}",
                     ], stdout=subprocess.PIPE)
         self.assertEqual(0, results.returncode)
