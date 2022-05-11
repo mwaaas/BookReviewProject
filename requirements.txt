@@ -6,3 +6,4 @@ ipywidgets
 ipymonaco
 playwright==1.21.0
 pytest-playwright==0.3.0
+freeport==0.1.15

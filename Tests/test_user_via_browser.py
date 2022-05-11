@@ -28,16 +28,36 @@ def wait_for_port(port, host='localhost', timeout=5.0, only_once=False):
 
 @pytest.fixture(scope="package")
 def server_fixture():
-    print("Starting server at host 0.0.0.0:5055")
+    port = 5055
+    # before starting server make sure its not already running.
+    try:
+        wait_for_port(port, only_once=True)
+    except TimeoutError:
+        # this is expected as server should not be runing at this point
+        pass
+    else:
+        # its running now stop it before starting
+        print(subprocess.check_output(f"freeport {port}", shell=True))
+
+
+    try:
+        wait_for_port(port, only_once=True)
+    except TimeoutError:
+        pass
+    else:
+        raise Exception("Server already running")
+
+
+    print(f"Starting server at host 0.0.0.0:{port}")
     process = subprocess.Popen([
         "python",
         "manage.py",
         "run_server",
         "--host=0.0.0.0",
-        "--port=5055"],
+        f"--port={port}"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
-    wait_for_port(5055)
+    wait_for_port(port)
     yield
     print("Terminating server")
     process.kill()
