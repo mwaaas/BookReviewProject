@@ -15,12 +15,21 @@ class TestUser(TestCase):
         users.clear_users()
 
     def test_register(self):
+        # test registering user one
         registered_users = users.register("foo", "bar", "bar", "30/12/1980")
 
         self.assertDictEqual(registered_users,  {"username": "foo", "password": "bar", "dateOfBirth": "30/12/1980"})
 
-        # test register with users name who already exist 
+        # test registering user two
+        registered_users_two = users.register('auma', 'just_password', 'just_password', "30/12/1970")
+
+        self.assertDictEqual(registered_users_two, {"username": "auma", "password": 'just_password', "dateOfBirth": "30/12/1970"})
+
+        # test register with users name who already exist
         self.assertRaises(users.UserAlreadyExist, users.register, "foo", "password", "password", "30/12/1980")
+
+        # test register with the same user two raises users already exist
+        self.assertRaises(users.UserAlreadyExist, users.register, "auma", "just_password", "passwdDoen'tMatter", "30/12/1970")
 
         # test register users with password missmatch 
         self.assertRaises(users.PasswordMissmatch, users.register, "favw", "password", "passwOrd", "30/12/1980")
