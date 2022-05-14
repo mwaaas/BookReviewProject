@@ -37,8 +37,11 @@ class TestUser(TestCase):
 
     def test_login(self):
         # first register users
-        registered_users = users.register("user1", "user1password", "user1password", "30/12/1980")
-        self.assertEqual(registered_users, users.login("user1", "user1password"))
+        registered_user_1 = users.register("user1", "user1password", "user1password", "30/12/1980")
+        self.assertEqual(registered_user_1, users.login("user1", "user1password"))
+
+        registered_user_2 = users.register("user2", "user2password", "user2password", "30/12/1970")
+        self.assertEqual(registered_user_2, users.login("user2", "user2password"))
 
         # test login with invalid password
         self.assertRaises(users.InvalidPassword, users.login, "user1", "wrongPassword")
