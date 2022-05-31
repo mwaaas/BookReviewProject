@@ -1,41 +1,37 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import socket
 
-# code borrowed from https://www.geeksforgeeks.org/building-a-basic-http-server-from-scratch-in-python/
-class BasicServer(BaseHTTPRequestHandler):
-
-    # creating a function for Get Request
-    def do_GET(self):
-
-        # Success Response --> 200
-        self.send_response(200)
-
-        # Type of file that we are using for creating our
-        # web server.
-        self.send_header('content-type', 'text/html')
-        self.end_headers()
-
-        # what we write in this function it gets visible on our
-        # web-server
-        self.wfile.write(
-            """
-            <html>
-                <head>
-                   <title>BookReview</title>
-                </head>
-                <body>
-                    <h1>Hello world</h1>
-                </body>
-            </html>
-            """.encode()
-        )
 
 def server(host, port):
-    """
-    Write code that starts server on host proviced and port. 
-    """
-    port = HTTPServer((host, port), BasicServer)
+    listening_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # this is used for running our
-    # server as long as we wish
-    # i.e. forever
-    port.serve_forever()
+    listening_socket.bind((host, port))
+    listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    listening_socket.listen(5)
+
+    print("starting server")
+
+    while True:
+        client_connection, client_address = listening_socket.accept()
+
+        request_data = client_connection.recv(1024)
+
+        print(f"request data: {request_data.decode()}")
+
+        html_page = """
+        <html>
+            <head>
+                <title>BookReview</title>
+            </head>
+            <body>
+                <h1> Hello world </h1>
+            </body>
+        </html>
+        """
+
+        client_connection.sendall(
+            f"HTTP/1.1 200 OK\r\nContent-Length: {len(html_page)}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{html_page}".encode()
+        )
+        client_connection.close()
+
+        print("done serving request")
