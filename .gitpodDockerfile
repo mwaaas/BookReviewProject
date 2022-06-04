@@ -10,3 +10,8 @@ RUN sudo apt-get update \
     && playwright install-deps 
 
 COPY . .
+
+WORKDIR /usr/src/app/docs
+RUN npm install 
+
+WORKDIR /usr/src/app
