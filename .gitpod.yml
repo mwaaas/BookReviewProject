@@ -1,2 +1,9 @@
 image:
   file: .gitpodDockerfile
+
+tasks:
+  - name: docs
+    init: |
+      cd docs
+      npm install
+    command: npm run start
