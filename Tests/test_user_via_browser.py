@@ -3,6 +3,8 @@ import subprocess
 import time
 import socket
 import random
+import string
+from users import login, register
 
 def wait_for_port(port, host='localhost', timeout=5.0, only_once=False):
     """Wait until a port starts accepting TCP connections.
@@ -26,9 +28,31 @@ def wait_for_port(port, host='localhost', timeout=5.0, only_once=False):
                 raise TimeoutError(f'Waited too long for the port {port} on host {host} to start accepting '
                                    'connections.') from ex
 
+@pytest.fixture(scope="module")
+def random_username():
+    return ''.join(random.choices(string.ascii_lowercase, k = 5))
+
+@pytest.fixture(scope="module")
+def random_password():
+    return ''.join(random.choices(string.ascii_lowercase, k = 5))
+
+
+@pytest.fixture(scope="function")
+def new_username():
+    return ''.join(random.choices(string.ascii_lowercase, k = 5))
+
+@pytest.fixture(scope="function")
+def new_password():
+    return ''.join(random.choices(string.ascii_lowercase, k = 5))
+
+
 @pytest.fixture(scope="package")
 def server_port():
     return random.randint(3000,9000)
+
+@pytest.fixture(scope="package")
+def server_url(server_port):
+    return f"http://localhost:{server_port}"
 
 @pytest.fixture(scope="package")
 def run_server_fixture(server_port):
@@ -68,6 +92,47 @@ def run_server_fixture(server_port):
 
 class TestLoginViaBrowser():
 
-    def test_landing_page_title(self, page, run_server_fixture, server_port):
-        page.goto(f"http://localhost:{server_port}")
+
+    def test_landing_page_title(self, page, run_server_fixture, server_url):
+        page.goto(server_url)
         assert page.title() == "BookReview"
+
+    def test_register_page_redirects_to_login(self, page, run_server_fixture, server_url, new_username, new_password):
+        # got to register page
+        page.goto(f"{server_url}")
+        page.fill("#username", new_username)
+        page.fill("#password1", new_password)
+        page.fill("#password2", new_password)
+        page.fill("#dateOfBirth", "2020-01-02")
+        page.click('#submit')
+
+        page.wait_for_load_state("networkidle")
+
+        # test page has been redirected
+        assert("/user/login" in page.url)
+
+
+    def test_register_page_adds_user(self, page, run_server_fixture, server_url, new_username, new_password):
+        # got to register page
+        page.goto(f"{server_url}")
+        page.fill("#username", new_username)
+        page.fill("#password1", new_password)
+        page.fill("#password2", new_password)
+        page.fill("#dateOfBirth", "2020-01-02")
+        page.click('#submit')
+
+        page.wait_for_load_state("networkidle")
+
+        # test page has been redirected
+        assert("/user/login" in page.url)
+
+        # now test login will return that user
+        try:
+            returned_user = login(new_username, new_password)
+            assert returned_user == {"username": new_username, "password": new_password, "dateOfBirth": "12/12/2020"}
+        except Exception as e:
+            assert False, f"User was not registered hence login failed with {e.__class__}"
+
+    def test_landing_page_redirects_to_registered_if_not_logged_in(self, page, run_server_fixture, server_url):
+        page.goto(server_url)
+        pass

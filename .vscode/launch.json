@@ -1,0 +1,81 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Python: server",
+            "type": "python",
+            "request": "launch",
+            "program": "manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "run_server",
+                "--port=${input:port}"
+            ],
+            "justMyCode": true
+        },
+        {
+            "name": "Python: manage.py user register",
+            "type": "python",
+            "request": "launch",
+            "program": "manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "user_register",
+                "--username=${input:username}",
+                "--password=${input:password}",
+                "--password2=${input:password2}",
+                "--dateOfBirth=${input:dateOfBirth}",
+            ]
+        },
+        {
+            "name": "Python: manage.py user login",
+            "type": "python",
+            "request": "launch",
+            "program": "manage.py",
+            "console": "integratedTerminal",
+            "args": [
+                "user_login",
+                "--username=${input:username}",
+                "--password=${input:password}",
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "username",
+            "description": "Enter username",
+            "type": "promptString"
+        },
+        {
+            "id": "password",
+            "description": "Enter password",
+            "type": "promptString"
+        },
+        {
+            "id": "password2",
+            "description": "Enter password2",
+            "type": "promptString"
+        },
+        {
+            "id": "dateOfBirth",
+            "description": "Enter date of birth",
+            "type": "promptString"
+        },
+        {
+            "id": "port",
+            "description": "Enter port",
+            "type": "promptString"
+        }
+    ]
+}
